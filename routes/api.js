@@ -3,6 +3,7 @@ const multer = require('multer');
 const config = require('config-lite')(__dirname);
 const router = express.Router();
 const mongoose = require('mongoose');
+const uuidV1 = require('uuid/v1');
 
 const File = require('../models/file');
 // connect to Mongoose
@@ -11,14 +12,15 @@ mongoose.connect(config.mongodb);
 const storage = multer.diskStorage({
   // 用来确定上传的文件存储在哪个文件夹
   destination: function (req, file, callback) {
-    callback(null, 'upload/')
+    callback(null, config.storage.dir)
   },
   // 用于确定上传后的文件保存名称
   filename: function (req, file, callback) {
     let suffix = file.originalname.split(".");
     let dir = file.mimetype.split('/')[0];
+    let uuid=uuidV1();
     console.log(file);
-    callback(null, dir + '/' + Date.now() + '.' + suffix[suffix.length - 1])
+    callback(null, dir + '/' + uuid.replace(/-/g,'') + '.' + suffix[suffix.length - 1])
   }
 });
 
@@ -43,7 +45,7 @@ router.post('/upload', function (req, res) {
   upload(req, res, function (err) {
     if (err) {
       // 发生错误
-      console.log("");
+      console.log(err);
       return res.json({
         code: 'error',
         msg: "请确认上传文件为图片、音频或视频"
