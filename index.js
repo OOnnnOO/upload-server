@@ -3,8 +3,10 @@
  */
 const express = require('express');
 const path = require('path');
+const config = require('config-lite')(__dirname);
 const index = require('./routes/index');
 const api = require('./routes/api');
+const pkg = require('./package');
 
 const app = express();
 
@@ -18,6 +20,6 @@ app.use(function (err, req, res, next) {
   res.status(500)
   res.send('error', { error: err })
 })
-app.listen(3000, function () {
-  console.log("express is running at 3000");
+app.listen(config.port, function () {
+console.log(`${pkg.name} listening on port ${config.port}`);
 });
